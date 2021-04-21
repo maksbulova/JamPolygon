@@ -47,14 +47,14 @@ public class PlayerController : MonoBehaviour
         float vert = Input.GetAxis("Vertical") * moveSpeed * Time.fixedDeltaTime;
         float hor = Input.GetAxis("Horizontal") * rotateSpeed * Time.fixedDeltaTime;
 
-        transform.Translate(vert, 0, 0);
+        transform.Translate(0, 0, vert);
         transform.Rotate(0, hor, 0);
     }
 
     private void FpsControll()
     {
         float vert = Input.GetAxis("Vertical") * moveSpeed * Time.fixedDeltaTime;
-        float hor = - Input.GetAxis("Horizontal") * moveSpeed * Time.fixedDeltaTime;
+        float hor = Input.GetAxis("Horizontal") * moveSpeed * Time.fixedDeltaTime;
 
         float mouseVert = 0;
         if (mouseVertical)
@@ -64,9 +64,11 @@ public class PlayerController : MonoBehaviour
         float mouseHor = Input.GetAxis("Mouse X") * rotateSpeed * Time.fixedDeltaTime;
 
         Space space = moveWorldAxis ? Space.World : Space.Self;
+        transform.Translate(hor, 0, vert, space);
 
-        transform.Translate(vert, 0, hor, space);
-        transform.Rotate(0, mouseHor, mouseVert);
+        transform.Rotate(-mouseVert, mouseHor, 0);
+
+        Debug.DrawRay(transform.position, transform.forward * 2, Color.red);
     }
 
     private void TpsControll()
@@ -75,7 +77,6 @@ public class PlayerController : MonoBehaviour
         float hor = Input.GetAxis("Horizontal") * moveSpeed * Time.fixedDeltaTime;
 
         Space space = moveWorldAxis ? Space.World : Space.Self;
-
         transform.Translate(hor, 0, vert, space);
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -84,7 +85,6 @@ public class PlayerController : MonoBehaviour
         Vector3 dir = (hit.point - transform.position).normalized;
         transform.rotation = Quaternion.LookRotation(dir);
         // transform.LookAt(hit.point);
-
-        Debug.DrawRay(transform.position, hit.point, Color.red);
+        Debug.DrawLine(transform.position, hit.point);
     }
 }
