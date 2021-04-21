@@ -16,8 +16,8 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed, rotateSpeed;
 
     [Header("Параметры управления"), Space]
-    public bool mouseVertical;
     public bool moveWorldAxis;
+    private bool mouseVertical = true;
 
     private void Awake()
     {
@@ -66,7 +66,11 @@ public class PlayerController : MonoBehaviour
         Space space = moveWorldAxis ? Space.World : Space.Self;
         transform.Translate(hor, 0, vert, space);
 
-        transform.Rotate(-mouseVert, mouseHor, 0);
+        // выглядит странно но решает проблему шарнирного застревания, не знаю как в кватернионах поворачивать в мировом пространстве
+        transform.Rotate(0, mouseHor, 0, Space.World);
+        transform.Rotate(-mouseVert, 0, 0, Space.Self);
+        
+        // transform.rotation *= Quaternion.Euler(mouseVert, mouseHor, 0); 
 
         Debug.DrawRay(transform.position, transform.forward * 2, Color.red);
     }
