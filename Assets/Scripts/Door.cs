@@ -4,20 +4,75 @@ using UnityEngine;
 
 public class Door : MonoBehaviour
 {
-    [Range(2, 10)]
-    public float DoorTriggerRadius;
+    public enum DoorType
+    {
+        sensor,
+        button
+    }
+
+    public DoorType type;
+
+    [Space, Header("Параметры режима двери в супермаркете (подошел - открылась)")]
+    public float DoorMaxTrigger;
+    public float DoorMinTrigger;
+
+    [Space, Header("Параметры режима рычага или кнопки (нажал - открылась)")]
+    public DoorButton[] buttons;
 
     private GameObject visitor;
+    private SphereCollider enterCollider;
 
+    private Vector3 rotateAxis;
 
-    private void Awake()
+    public bool CheckButtons()
     {
-        gameObject.GetComponent<SphereCollider>().radius = DoorTriggerRadius;
+        foreach (DoorButton button in buttons)
+        {
+            if (!button.pressed)
+            {
+                return false;
+            }
+        }
+        return true;
     }
+
 
     private void OnValidate()
     {
-        gameObject.GetComponent<SphereCollider>().radius = DoorTriggerRadius;
+        // enterCollider.radius = DoorMaxTrigger;
+        enterCollider = gameObject.GetComponent<SphereCollider>();
+        rotateAxis = gameObject.transform.Find("OpenAxis2").transform.position - gameObject.transform.Find("OpenAxis1").transform.position;
+
+        switch (type)
+        {
+            case DoorType.sensor:
+                enterCollider.enabled = true;
+                break;
+            case DoorType.button:
+                enterCollider.enabled = false;
+
+                foreach (DoorButton button in buttons)
+                {
+                    button.OnPress += Button_OnPress;
+                }
+
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void Button_OnPress(object sender, System.EventArgs e)
+    {
+        //throw new System.NotImplementedException();
+
+        Debug.Log("Где-то проскрипел рычаг");
+
+        if (CheckButtons())
+        {
+            // StartCoroutine(OpenDoor());
+            OpenDoor();
+        }
     }
 
 
@@ -26,7 +81,7 @@ public class Door : MonoBehaviour
         if (other.TryGetComponent<PlayerController>(out PlayerController player))
         {
             visitor = player.gameObject;
-            StartCoroutine(DoorOpening());
+            StartCoroutine(OpeningDoor());
         }
     }
 
@@ -34,21 +89,37 @@ public class Door : MonoBehaviour
     {
         if (other.gameObject == visitor)
         {
-            StopCoroutine(DoorOpening());
             visitor = null;
+            StopCoroutine(OpeningDoor());
         }
 
     }
 
+    
+    private void OpenDoor()
+    {
+        Debug.Log("Дверь открылась");
 
-    private IEnumerator DoorOpening()
+        gameObject.transform.localEulerAngles = new Vector3(0, 90, 0);
+        /*
+        for (float i = 0; i < 90; i+=1)
+        {
+            // gameObject.transform.localEulerAngles = new Vector3(0, Mathf.Lerp(0, -90, i), 0);
+            transform.RotateAround(rotateAxis, 1);
+
+            yield return new WaitForFixedUpdate();
+        }
+        */
+    }
+
+    private IEnumerator OpeningDoor()
     {
         float dist, l, doorAngle;
-        while (true)
+        while (visitor != null)
         {
             dist = Vector3.Distance(transform.position, visitor.transform.position);
 
-            l = Mathf.InverseLerp(DoorTriggerRadius, DoorTriggerRadius-2, dist);
+            l = Mathf.InverseLerp(DoorMaxTrigger, DoorMinTrigger, dist);
             doorAngle = Mathf.Lerp(0, -90, l);
 
             gameObject.transform.localEulerAngles = new Vector3(0, doorAngle, 0);

@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Параметры управления"), Space]
     public bool moveWorldAxis;
-    private bool mouseVertical = true;
+    public bool mouseVertical;
 
     private void Awake()
     {
