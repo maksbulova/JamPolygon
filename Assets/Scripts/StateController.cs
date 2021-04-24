@@ -15,15 +15,19 @@ public class StateController : MonoBehaviour
 
     private bool lightOn;
 
+    public float healRate;
+
     private void Start()
     {
         health = maxHealth;
         fuelLevel = maxFuel;
 
-        lamp.gameObject.SetActive(false);
+        lamp.enabled = false;
         lightOn = false;
     }
 
+
+    // пока фонарь гоит каждую секунду тратится топливо
     private IEnumerator FuelConsumption()
     {
         while (lightOn && fuelLevel > 0)
@@ -32,9 +36,11 @@ public class StateController : MonoBehaviour
             yield return new WaitForSeconds(1);
         }
         // если топливо кончилось
-        Light(false);
+        TurnLight(false);
     }
 
+
+    // заправить фонарь
     public void Refuel(float fuel)
     {
         fuelLevel += fuel;
@@ -44,9 +50,10 @@ public class StateController : MonoBehaviour
         }
     }
 
-    public void Damage(float dmg)
+    // сюда и хилка и дамаг, для дамага передается отрицательное значение
+    public void SetHealth(float hp)
     {
-        health -= dmg;
+        health += hp;
         if (health <= 0)
         {
             Death();
@@ -59,39 +66,69 @@ public class StateController : MonoBehaviour
 
     private void Death()
     {
-        Debug.Log("Вмер");
+        Debug.Log("Гоблін вмер");
         Destroy(gameObject);
     }
 
-    private void Light(bool on)
-    {
-        lightOn = on;
 
-        if (lightOn)
+    // переключение света
+    private void TurnLight(bool on)
+    {
+
+        if (on && (fuelLevel > 0))
         {
-            if (fuelLevel > 0)
-            {
-                
-                StartCoroutine(FuelConsumption());
-            }
-            else
-            {
-                lightOn = false;
-            }
+            lightOn = true;
+            StartCoroutine(FuelConsumption());
         }
         else
         {
+            lightOn = false;
             StopCoroutine(FuelConsumption());
         }
-        lamp.gameObject.SetActive(lightOn);
+        lamp.enabled = lightOn;
     }
 
     private void Update()
     {
         if (Input.GetKeyDown("f"))
         {
-            Light(!lightOn);
+            TurnLight(!lightOn);
+        }
+
+        if (Input.GetKeyDown("q") && medicine && (health < maxHealth))
+        {
+            medicine = false;
+            SetHealth(healRate);
         }
     }
+
+
+    // проверяется в скрипте двери
+    private bool key;
+    private bool medicine;
+
+    public void RecieveLoot(Loot item)
+    {
+        switch (item.item)
+        {
+            case Loot.LootItem.questKey:
+                key = true;
+                break;
+
+            case Loot.LootItem.medicine:
+                medicine = true;
+                break;
+
+            case Loot.LootItem.lampOil:
+                Refuel(item.fuelRecover);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+
+
 
 }
