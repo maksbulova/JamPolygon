@@ -1515,7 +1515,7 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 0.8915094, g: 1, b: 0.99789685, a: 1}
+  m_Color: {r: 0.9933154, g: 1, b: 0.8726415, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
@@ -3264,7 +3264,7 @@ PrefabInstance:
     - target: {fileID: 1020785193444666800, guid: e6c59a40148fdbf42b8809f3a00090a9,
         type: 3}
       propertyPath: m_RootOrder
-      value: 8
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1020785193444666800, guid: e6c59a40148fdbf42b8809f3a00090a9,
         type: 3}
@@ -3323,104 +3323,90 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e6c59a40148fdbf42b8809f3a00090a9, type: 3}
---- !u!1001 &3774764105829345989
+--- !u!1001 &5152011512842989425
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1763055273196016088, guid: c3d533ef0de1a73449de19f11473a156,
+    - target: {fileID: 2841295518313372385, guid: c3d533ef0de1a73449de19f11473a156,
         type: 3}
-      propertyPath: m_Name
-      value: Door
-      objectReference: {fileID: 0}
-    - target: {fileID: 1763055273196016088, guid: c3d533ef0de1a73449de19f11473a156,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2518606859896870414, guid: c3d533ef0de1a73449de19f11473a156,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 2518606859896870414, guid: c3d533ef0de1a73449de19f11473a156,
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000,
+        type: 0}
+    - target: {fileID: 2979732212569992552, guid: c3d533ef0de1a73449de19f11473a156,
         type: 3}
       propertyPath: m_LocalPosition.x
       value: 7
       objectReference: {fileID: 0}
-    - target: {fileID: 2518606859896870414, guid: c3d533ef0de1a73449de19f11473a156,
+    - target: {fileID: 2979732212569992552, guid: c3d533ef0de1a73449de19f11473a156,
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 2518606859896870414, guid: c3d533ef0de1a73449de19f11473a156,
+    - target: {fileID: 2979732212569992552, guid: c3d533ef0de1a73449de19f11473a156,
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 10
       objectReference: {fileID: 0}
-    - target: {fileID: 2518606859896870414, guid: c3d533ef0de1a73449de19f11473a156,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2518606859896870414, guid: c3d533ef0de1a73449de19f11473a156,
+    - target: {fileID: 2979732212569992552, guid: c3d533ef0de1a73449de19f11473a156,
         type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2518606859896870414, guid: c3d533ef0de1a73449de19f11473a156,
+    - target: {fileID: 2979732212569992552, guid: c3d533ef0de1a73449de19f11473a156,
         type: 3}
       propertyPath: m_LocalRotation.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2518606859896870414, guid: c3d533ef0de1a73449de19f11473a156,
+    - target: {fileID: 2979732212569992552, guid: c3d533ef0de1a73449de19f11473a156,
         type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2518606859896870414, guid: c3d533ef0de1a73449de19f11473a156,
+    - target: {fileID: 2979732212569992552, guid: c3d533ef0de1a73449de19f11473a156,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2979732212569992552, guid: c3d533ef0de1a73449de19f11473a156,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2979732212569992552, guid: c3d533ef0de1a73449de19f11473a156,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2518606859896870414, guid: c3d533ef0de1a73449de19f11473a156,
+    - target: {fileID: 2979732212569992552, guid: c3d533ef0de1a73449de19f11473a156,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2518606859896870414, guid: c3d533ef0de1a73449de19f11473a156,
+    - target: {fileID: 2979732212569992552, guid: c3d533ef0de1a73449de19f11473a156,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5393370713038053475, guid: c3d533ef0de1a73449de19f11473a156,
+    - target: {fileID: 3062358304992033576, guid: c3d533ef0de1a73449de19f11473a156,
         type: 3}
-      propertyPath: buttons.Array.size
-      value: 1
+      propertyPath: m_Name
+      value: Door
       objectReference: {fileID: 0}
-    - target: {fileID: 5393370713038053475, guid: c3d533ef0de1a73449de19f11473a156,
-        type: 3}
-      propertyPath: DoorTrigerRadius
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5393370713038053475, guid: c3d533ef0de1a73449de19f11473a156,
-        type: 3}
-      propertyPath: DoorTriggerRadius
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5393370713038053475, guid: c3d533ef0de1a73449de19f11473a156,
-        type: 3}
-      propertyPath: type
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5393370713038053475, guid: c3d533ef0de1a73449de19f11473a156,
+    - target: {fileID: 3447626844565048753, guid: c3d533ef0de1a73449de19f11473a156,
         type: 3}
       propertyPath: buttons.Array.data[0]
       value: 
       objectReference: {fileID: 702220769}
-    - target: {fileID: 8297176419559544200, guid: c3d533ef0de1a73449de19f11473a156,
+    - target: {fileID: 3447626844565048753, guid: c3d533ef0de1a73449de19f11473a156,
+        type: 3}
+      propertyPath: type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5135158312273657211, guid: c3d533ef0de1a73449de19f11473a156,
         type: 3}
       propertyPath: m_Enabled
       value: 0

@@ -22,7 +22,7 @@ public class Door : MonoBehaviour
     private GameObject visitor;
     private SphereCollider enterCollider;
 
-    private Vector3 rotateAxis;
+    private GameObject rotateAxis;
 
     public bool CheckButtons()
     {
@@ -36,12 +36,17 @@ public class Door : MonoBehaviour
         return true;
     }
 
+    private void Awake()
+    {
+        rotateAxis = GameObject.Find("RotateAxis");
+
+    }
 
     private void OnValidate()
     {
         // enterCollider.radius = DoorMaxTrigger;
-        enterCollider = gameObject.GetComponent<SphereCollider>();
-        rotateAxis = gameObject.transform.Find("OpenAxis2").transform.position - gameObject.transform.Find("OpenAxis1").transform.position;
+        enterCollider = transform.Find("DoorTrigger").GetComponent<SphereCollider>();
+        
 
         switch (type)
         {
@@ -64,52 +69,51 @@ public class Door : MonoBehaviour
 
     private void Button_OnPress(object sender, System.EventArgs e)
     {
-        //throw new System.NotImplementedException();
+        // throw new System.NotImplementedException();
 
         Debug.Log("Где-то проскрипел рычаг");
 
         if (CheckButtons())
         {
-            // StartCoroutine(OpenDoor());
-            OpenDoor();
+            StartCoroutine(OpenDoor());
         }
     }
 
 
-    private void OnTriggerEnter(Collider other)
+    public void Trigger(bool enter, Collider other)
     {
-        if (other.TryGetComponent<PlayerController>(out PlayerController player))
+        if (enter)
         {
-            visitor = player.gameObject;
-            StartCoroutine(OpeningDoor());
+            if (other.TryGetComponent<PlayerController>(out PlayerController player))
+            {
+                visitor = player.gameObject;
+                StartCoroutine(OpeningDoor());
+            }
+
         }
+        else
+        {
+            if (other.gameObject == visitor)
+            {
+                visitor = null;
+                StopCoroutine(OpeningDoor());
+            }
+
+        }
+
     }
 
-    private void OnTriggerExit(Collider other)
+
+    private IEnumerator OpenDoor()
     {
-        if (other.gameObject == visitor)
+        Debug.Log("Дверь что-то делает");
+
+        for (float i = 0; i < 1; i+=0.01f)
         {
-            visitor = null;
-            StopCoroutine(OpeningDoor());
-        }
-
-    }
-
-    
-    private void OpenDoor()
-    {
-        Debug.Log("Дверь открылась");
-
-        gameObject.transform.localEulerAngles = new Vector3(0, 90, 0);
-        /*
-        for (float i = 0; i < 90; i+=1)
-        {
-            // gameObject.transform.localEulerAngles = new Vector3(0, Mathf.Lerp(0, -90, i), 0);
-            transform.RotateAround(rotateAxis, 1);
+            rotateAxis.transform.localEulerAngles = new Vector3(0, Mathf.Lerp(0, -90, i), 0);
 
             yield return new WaitForFixedUpdate();
         }
-        */
     }
 
     private IEnumerator OpeningDoor()
@@ -122,7 +126,7 @@ public class Door : MonoBehaviour
             l = Mathf.InverseLerp(DoorMaxTrigger, DoorMinTrigger, dist);
             doorAngle = Mathf.Lerp(0, -90, l);
 
-            gameObject.transform.localEulerAngles = new Vector3(0, doorAngle, 0);
+            rotateAxis.transform.localEulerAngles = new Vector3(0, doorAngle, 0);
 
             yield return new WaitForFixedUpdate();
         }

@@ -26,6 +26,7 @@ public class DoorButton : MonoBehaviour
         }
     }
 
+
     private void Update()
     {
         if (Input.GetKeyDown("e") && visitor != null)
