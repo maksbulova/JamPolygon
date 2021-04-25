@@ -8,19 +8,19 @@ public class Enemy : MonoBehaviour
     private NavMeshAgent agent;
     private SphereCollider senceCol;
 
-    public float senceRange, senceAngle;
+    public float senceRange, senceAngle, hitRange, hitRate, hitDamage;
 
     public enum EnemyState
     {
         patrol,
-        attack
-        //flee
+        hunt,
+        melee
     }
     public EnemyState state;
 
     public Transform[] patrolWay;
 
-    private Transform player;
+    private GameObject player;
 
     private void Start()
     {
@@ -28,20 +28,20 @@ public class Enemy : MonoBehaviour
         senceCol.radius = senceRange;
 
         agent = GetComponent<NavMeshAgent>();
+
         StartCoroutine(Patrol());
     }
 
     private void OnValidate()
     {
+
         GetComponent<SphereCollider>().radius = senceRange;
 
-
-        // отображает угол
+        // отображает угол обзора
         Debug.DrawLine(transform.position, transform.position + transform.forward, Color.blue, 1);
         float radAngle = (senceAngle * Mathf.PI)/ 180;
         Debug.DrawLine(transform.position, transform.position + new Vector3(Mathf.Sin(radAngle), 0, Mathf.Cos(radAngle)) * senceRange, Color.red, 1);
         Debug.DrawLine(transform.position, transform.position + new Vector3(Mathf.Sin(-radAngle), 0, Mathf.Cos(-radAngle)) * senceRange, Color.red, 1);
-
     }
 
 
@@ -51,8 +51,7 @@ public class Enemy : MonoBehaviour
     {
         if (other.gameObject.TryGetComponent(out PlayerController plr))
         {
-            Debug.Log("что-то рядом?");
-            player = plr.gameObject.transform;
+            player = plr.gameObject;
             StartCoroutine(CheckDirectView());
         }
 
@@ -61,56 +60,103 @@ public class Enemy : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.transform == player)
+        if (other.gameObject == player)
         {
-            Debug.Log("показалось");
             player = null;
 
             StopCoroutine(CheckDirectView());
+            if (state != EnemyState.patrol)
+                StartCoroutine(Patrol());
         }
     }
 
 
     private IEnumerator CheckDirectView()
     {
+        Debug.Log("чек директ вью");
+        // пока где-то рядом есть игрок
         while (player != null)
         {
-            Vector3 dir = player.position - transform.position;
+            // луч в сторону игрока, потом проверка в поле ли он зрения и не за препятствием ли
+            Vector3 dir = player.transform.position - transform.position;
             Ray ray = new Ray(transform.position, dir);
 
-            if(Physics.Raycast(ray, out RaycastHit hit, senceRange))
+            // заметил игрока
+            // пока преследует игрока обзор шире чтоб совсем нелепых побегов не было
+            if (Physics.Raycast(ray, out RaycastHit hit, senceRange) && hit.collider.gameObject == player && (Vector3.Angle(transform.forward, dir) < (state == EnemyState.hunt ? senceAngle * 2 : senceAngle)))
             {
-                // заметил
-                if(hit.collider.gameObject == player && (Vector3.Angle(transform.forward, dir) < senceAngle))
+                if (state != EnemyState.hunt && state != EnemyState.melee)
                 {
-                    state = EnemyState.attack;
-                    StartCoroutine(Attack());
-
+                    StartCoroutine(RunToPlayer());
                 }
-                // вне поля зрения или за укрытием
-                else
+
+            }
+            // вне угла зрения или за укрытием
+            else
+            {
+                if (state != EnemyState.patrol)
                 {
-                    state = EnemyState.patrol;
                     StartCoroutine(Patrol());
-
                 }
+            }
+
+            yield return null;
+        }
+    
+    }
+
+    private IEnumerator RunToPlayer()
+    {
+        agent.stoppingDistance = 5;
+        Debug.Log("в погоню!");
+        state = EnemyState.hunt;
+        while (state == EnemyState.hunt && (player != null))
+        {
+            // Vector3 v = (player.transform.position - transform.position).normalized * 2;
+            agent.SetDestination(player.transform.position);
+            
+            if (Vector3.Distance(transform.position, player.transform.position) <= hitRange)
+            {
+                state = EnemyState.melee;
+                StartCoroutine(Melee());
             }
 
             yield return null;
         }
     }
 
-    private IEnumerator Attack()
+    private IEnumerator Melee()
     {
-        while (state == EnemyState.attack)
+        Debug.Log("меле");
+        state = EnemyState.melee;
+        float t = hitRate;
+        StateController plr = player.GetComponent<StateController>();
+        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+
+        while (state == EnemyState.melee && player != null && Vector3.Distance(transform.position, player.transform.position) <= hitRange)
         {
-            agent.SetDestination(player.position);
-            yield return null;
+            rb.MoveRotation(Quaternion.LookRotation(player.transform.position));
+            
+            if (t >= hitRate)
+            {
+                Debug.Log("Удар");
+                plr.SetHealth(-hitDamage);
+                t = 0;
+            }
+            t += Time.fixedDeltaTime;
+
+            yield return new WaitForFixedUpdate();
         }
+        StartCoroutine(RunToPlayer());
+
     }
 
     private IEnumerator Patrol()
     {
+        agent.stoppingDistance = 0;
+        Debug.Log("патруль");
+        yield return new WaitForSeconds(1);
+        state = EnemyState.patrol;
         int i = 0;
 
         while (state == EnemyState.patrol && patrolWay.Length > 0)

@@ -2646,6 +2646,21 @@ PrefabInstance:
       propertyPath: patrolWay.Array.data[1]
       value: 
       objectReference: {fileID: 2133205591}
+    - target: {fileID: 2323396897385413506, guid: 4d42103300352b142bc3fa9d32ffde9a,
+        type: 3}
+      propertyPath: senceRange
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2323396897385413507, guid: 4d42103300352b142bc3fa9d32ffde9a,
+        type: 3}
+      propertyPath: m_Speed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2323396897385413507, guid: 4d42103300352b142bc3fa9d32ffde9a,
+        type: 3}
+      propertyPath: m_AngularSpeed
+      value: 180
+      objectReference: {fileID: 0}
     - target: {fileID: 2323396897385413509, guid: 4d42103300352b142bc3fa9d32ffde9a,
         type: 3}
       propertyPath: m_Name
@@ -2709,7 +2724,7 @@ PrefabInstance:
     - target: {fileID: 7635143776715306024, guid: 4d42103300352b142bc3fa9d32ffde9a,
         type: 3}
       propertyPath: m_Radius
-      value: 5
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7635143776715306024, guid: 4d42103300352b142bc3fa9d32ffde9a,
         type: 3}
