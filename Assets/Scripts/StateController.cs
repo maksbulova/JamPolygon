@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class StateController : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class StateController : MonoBehaviour
 
     public float healRate;
 
+    public Image keyImage, lampImage, medImage;
+
     private void Start()
     {
         health = maxHealth;
@@ -24,6 +27,9 @@ public class StateController : MonoBehaviour
 
         lamp.enabled = false;
         lightOn = false;
+
+        SetUI();
+        StartCoroutine(HelthBar());
     }
 
 
@@ -62,6 +68,8 @@ public class StateController : MonoBehaviour
         {
             health = maxHealth;
         }
+
+        StartCoroutine(HelthBar());
     }
 
     private void Death()
@@ -99,6 +107,7 @@ public class StateController : MonoBehaviour
         {
             medicine = false;
             RecieveDamage(-healRate);
+            SetUI(medImage, medicine);
         }
     }
 
@@ -126,8 +135,51 @@ public class StateController : MonoBehaviour
             default:
                 break;
         }
+
+        SetUI();
     }
 
+    private void SetUI(Image img, bool active)
+    {
+        if (active)
+        {
+            img.color = Color.white;
+        }
+        else
+        {
+            img.color = new Color(0, 0, 0, 127);
+        }
+
+    }
+
+    private void SetUI()
+    {
+        SetUI(medImage, medicine);
+        SetUI(keyImage, key);
+    }
+
+    public AnimationCurve hpCurve;
+    public Image hpFull, hpEmpty;
+    private IEnumerator HelthBar()
+    {
+        float oldScaled = hpFull.fillAmount;
+        float hpPercent = health / maxHealth;
+        float newScaled = hpPercent * 0.6f + 0.2f; 
+
+        for (float t = 0; t < 1; t+=Time.fixedDeltaTime)
+        {
+            float tempScaled = Mathf.Lerp(oldScaled, newScaled, hpCurve.Evaluate(t));
+
+            hpFull.fillAmount = tempScaled;
+            hpEmpty.fillAmount = 1 - tempScaled;
+
+            yield return new WaitForFixedUpdate();
+        }
+
+        hpFull.fillAmount = newScaled;
+        hpEmpty.fillAmount = 1 - newScaled;
+
+    }
 
 
 
