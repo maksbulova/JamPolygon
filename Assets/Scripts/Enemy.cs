@@ -8,13 +8,17 @@ public class Enemy : MonoBehaviour
     private NavMeshAgent agent;
     private SphereCollider senceCol;
 
-    public float senceRange, senceAngle, hitRange, hitRate, hitDamage;
+    public float maxHealth;
+    private float health;
+    public float senceRange, senceAngle;
+    public float hitRange, hitRate, hitDamage;
+
+
 
     public enum EnemyState
     {
         patrol,
-        hunt,
-        melee
+        attack
     }
     public EnemyState state;
 
@@ -24,6 +28,8 @@ public class Enemy : MonoBehaviour
 
     private void Start()
     {
+        health = maxHealth;
+
         senceCol = GetComponent<SphereCollider>();
         senceCol.radius = senceRange;
 
@@ -71,6 +77,21 @@ public class Enemy : MonoBehaviour
     }
 
 
+    public void RecieveDamage(float dmg)
+    {
+        health -= dmg;
+        if (health <= 0)
+        {
+            Death();
+        }
+    }
+
+    public void Death()
+    {
+        Destroy(gameObject);
+    }
+
+
     private IEnumerator CheckDirectView()
     {
         Debug.Log("чек директ вью");
@@ -83,11 +104,11 @@ public class Enemy : MonoBehaviour
 
             // заметил игрока
             // пока преследует игрока обзор шире чтоб совсем нелепых побегов не было
-            if (Physics.Raycast(ray, out RaycastHit hit, senceRange) && hit.collider.gameObject == player && (Vector3.Angle(transform.forward, dir) < (state == EnemyState.hunt ? senceAngle * 2 : senceAngle)))
+            if (Physics.Raycast(ray, out RaycastHit hit, senceRange) && hit.collider.gameObject == player && (Vector3.Angle(transform.forward, dir) < (state == EnemyState.attack ? senceAngle * 2 : senceAngle)))
             {
-                if (state != EnemyState.hunt && state != EnemyState.melee)
+                if (state != EnemyState.attack)
                 {
-                    StartCoroutine(RunToPlayer());
+                    StartCoroutine(Attack());
                 }
 
             }
@@ -105,51 +126,45 @@ public class Enemy : MonoBehaviour
     
     }
 
-    private IEnumerator RunToPlayer()
+
+    private bool reloaded = true;
+
+    private IEnumerator Reload()
     {
-        agent.stoppingDistance = 5;
+        reloaded = false;  
+
+        yield return new WaitForSeconds(hitRate);
+
+        reloaded = true;
+    }
+
+    private IEnumerator Attack()
+    {
         Debug.Log("в погоню!");
-        state = EnemyState.hunt;
-        while (state == EnemyState.hunt && (player != null))
+
+
+        StateController plr = player.GetComponent<StateController>();
+        // Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+
+        agent.stoppingDistance = hitRange;
+        state = EnemyState.attack;
+        while (state == EnemyState.attack && (player != null))
         {
-            // Vector3 v = (player.transform.position - transform.position).normalized * 2;
             agent.SetDestination(player.transform.position);
             
-            if (Vector3.Distance(transform.position, player.transform.position) <= hitRange)
+            if (reloaded && Vector3.Distance(transform.position, player.transform.position) <= hitRange)
             {
-                state = EnemyState.melee;
-                StartCoroutine(Melee());
+                Debug.Log("Удар");
+                plr.RecieveDamage(hitDamage);
+
+                StartCoroutine(Reload());
+
             }
 
             yield return null;
         }
     }
 
-    private IEnumerator Melee()
-    {
-        Debug.Log("меле");
-        state = EnemyState.melee;
-        float t = hitRate;
-        StateController plr = player.GetComponent<StateController>();
-        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
-
-        while (state == EnemyState.melee && player != null && Vector3.Distance(transform.position, player.transform.position) <= hitRange)
-        {
-            rb.MoveRotation(Quaternion.LookRotation(player.transform.position));
-            
-            if (t >= hitRate)
-            {
-                Debug.Log("Удар");
-                plr.SetHealth(-hitDamage);
-                t = 0;
-            }
-            t += Time.fixedDeltaTime;
-
-            yield return new WaitForFixedUpdate();
-        }
-        StartCoroutine(RunToPlayer());
-
-    }
 
     private IEnumerator Patrol()
     {

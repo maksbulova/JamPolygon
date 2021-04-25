@@ -50,10 +50,10 @@ public class StateController : MonoBehaviour
         }
     }
 
-    // сюда и хилка и дамаг, для дамага передается отрицательное значение
-    public void SetHealth(float hp)
+    // сюда и хилка и дамаг, для хилки передается отрицательное значение
+    public void RecieveDamage(float dmg)
     {
-        health += hp;
+        health -= dmg;
         if (health <= 0)
         {
             Death();
@@ -98,7 +98,7 @@ public class StateController : MonoBehaviour
         if (Input.GetKeyDown("q") && medicine && (health < maxHealth))
         {
             medicine = false;
-            SetHealth(healRate);
+            RecieveDamage(-healRate);
         }
     }
 
