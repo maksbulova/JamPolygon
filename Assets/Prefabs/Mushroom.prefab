@@ -147,7 +147,7 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 8
+  m_Radius: 9.237604
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &2323396897385413506
 MonoBehaviour:
@@ -161,10 +161,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d95a280a5c4f394fae627239c4f8dda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxHealth: 10
   senceRange: 8
   senceAngle: 45
   hitRange: 3
-  hitRate: 10
+  hitReload: 5
   hitDamage: 10
-  state: 0
+  dropChanse: 50
+  dropLoot: {fileID: 2323396897385413509}
+  potBreak: {fileID: 0}
   patrolWay: []

@@ -24,6 +24,9 @@ public class Door : MonoBehaviour
 
     private GameObject rotateAxis;
 
+    private bool opened = false;
+
+    // фалсе если хоть 1 кнопка не активна
     public bool CheckButtons()
     {
         foreach (DoorButton button in buttons)
@@ -73,10 +76,7 @@ public class Door : MonoBehaviour
 
         Debug.Log("Где-то проскрипел рычаг");
 
-        if (CheckButtons())
-        {
-            StartCoroutine(OpenDoor());
-        }
+        StartCoroutine(OpenDoor(CheckButtons()));
     }
 
 
@@ -104,16 +104,38 @@ public class Door : MonoBehaviour
     }
 
 
-    private IEnumerator OpenDoor()
+    public AnimationCurve doorCurve;
+    private IEnumerator OpenDoor(bool openDoor)
     {
-        Debug.Log("Дверь что-то делает");
-
-        for (float i = 0; i < 1; i+=0.01f)
+        if (openDoor && !opened)
         {
-            rotateAxis.transform.localEulerAngles = new Vector3(0, Mathf.Lerp(0, -90, i), 0);
+            for (float t = 0; t < 1; t += Time.deltaTime)
+            {
+                float temp = doorCurve.Evaluate(t);
+                rotateAxis.transform.localEulerAngles = new Vector3(0, Mathf.Lerp(0, 90, temp), 0);
 
-            yield return new WaitForFixedUpdate();
+                yield return new WaitForFixedUpdate();
+            }
+            opened = true;
+
         }
+        else if(!openDoor && opened)
+        {
+            Debug.Log("закрыть");
+            for (float t = 0; t < 1; t += Time.deltaTime)
+            {
+                float temp = doorCurve.Evaluate(t);
+                rotateAxis.transform.localEulerAngles = new Vector3(0, Mathf.Lerp(90, 0, temp), 0);
+
+                yield return new WaitForFixedUpdate();
+            }
+            opened = false;
+        }
+    }
+
+    private void OpenDoor()
+    {
+        StartCoroutine(OpenDoor(!opened));
     }
 
     private IEnumerator OpeningDoor()

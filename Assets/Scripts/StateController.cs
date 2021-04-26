@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +12,10 @@ public class StateController : MonoBehaviour
     public float fuelConsumption;
     public Light lamp;
 
+    // ключ проверяется в двери
+    private int keys;
+    private bool medicine;
+
     private float health;
     private float fuelLevel;
 
@@ -19,6 +24,9 @@ public class StateController : MonoBehaviour
     public float healRate;
 
     public Image keyImage, lampImage, medImage;
+    public Text keyAmount;
+
+    public event EventHandler DeathEvent;
 
     private void Start()
     {
@@ -30,6 +38,7 @@ public class StateController : MonoBehaviour
 
         SetUI();
         StartCoroutine(HelthBar());
+        StartCoroutine(FuelBar());
     }
 
 
@@ -39,6 +48,7 @@ public class StateController : MonoBehaviour
         while (lightOn && fuelLevel > 0)
         {
             fuelLevel -= fuelConsumption;
+            StartCoroutine(FuelBar());
             yield return new WaitForSeconds(1);
         }
         // если топливо кончилось
@@ -54,11 +64,13 @@ public class StateController : MonoBehaviour
         {
             fuelLevel = maxFuel;
         }
+        StartCoroutine(FuelBar());
     }
 
     // сюда и хилка и дамаг, для хилки передается отрицательное значение
-    public void RecieveDamage(float dmg)
+    public IEnumerator RecieveDamage(float dmg)
     {
+
         health -= dmg;
         if (health <= 0)
         {
@@ -70,12 +82,29 @@ public class StateController : MonoBehaviour
         }
 
         StartCoroutine(HelthBar());
+
+        if (dmg > 0)
+        {
+            GetComponent<Renderer>().material.color = Color.red;
+        }
+        else
+        {
+            GetComponent<Renderer>().material.color = Color.blue;
+        }
+        
+
+        yield return new WaitForSeconds(0.2f);
+
+        GetComponent<Renderer>().material.color = Color.white;
+
     }
 
     private void Death()
     {
         Debug.Log("Гоблін вмер");
-        Destroy(gameObject);
+        // Destroy(gameObject);
+
+        DeathEvent(this, EventArgs.Empty);
     }
 
 
@@ -106,22 +135,19 @@ public class StateController : MonoBehaviour
         if (Input.GetKeyDown("q") && medicine && (health < maxHealth))
         {
             medicine = false;
-            RecieveDamage(-healRate);
+            StartCoroutine(RecieveDamage(-healRate));
             SetUI(medImage, medicine);
         }
     }
 
 
-    // проверяется в скрипте двери
-    private bool key;
-    private bool medicine;
 
     public void RecieveLoot(Loot item)
     {
         switch (item.item)
         {
             case Loot.LootItem.questKey:
-                key = true;
+                keys += 1;
                 break;
 
             case Loot.LootItem.medicine:
@@ -155,7 +181,8 @@ public class StateController : MonoBehaviour
     private void SetUI()
     {
         SetUI(medImage, medicine);
-        SetUI(keyImage, key);
+        SetUI(keyImage, (keys > 0));
+        keyAmount.text = keys.ToString();
     }
 
     public AnimationCurve hpCurve;
@@ -181,6 +208,33 @@ public class StateController : MonoBehaviour
 
     }
 
+    public Image lampFull, lampEmpty;
+    private IEnumerator FuelBar()
+    {
+        float oldScaled = lampFull.fillAmount;
+        float fuelPercent = fuelLevel / maxFuel;
+        for (float t = 0; t < 1; t += Time.fixedDeltaTime)
+        {
+            float tempScaled = Mathf.Lerp(oldScaled, fuelPercent, t);
 
+            lampFull.fillAmount = tempScaled;
+            lampEmpty.fillAmount = 1 - tempScaled;
+
+            yield return new WaitForFixedUpdate();
+        }
+
+        lampFull.fillAmount = fuelPercent;
+        lampEmpty.fillAmount = 1 - fuelPercent;
+
+    }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Death"))
+        {
+            Death();
+        }
+    }
 
 }
